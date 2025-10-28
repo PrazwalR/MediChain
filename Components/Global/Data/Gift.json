@@ -1,0 +1,17 @@
+[
+  {
+    "title": "Smart Patient Record System",
+    "message": "Securely store and access your medical records through MediChain’s blockchain-powered system — ensuring privacy, accuracy, and instant availability across hospitals.",
+    "price": "Included in Care Plan"
+  },
+  {
+    "title": "AI-Based Health Diagnostics",
+    "message": "Experience faster and more accurate diagnosis with MediChain’s AI engine that analyzes patient data and lab reports for better treatment decisions.",
+    "price": "Starting at ₹499"
+  },
+  {
+    "title": "Telemedicine & E-Consultation",
+    "message": "Book online consultations with certified doctors, share health data securely, and receive digital prescriptions — all powered by MediChain’s decentralized healthcare network.",
+    "price": "₹299 per session"
+  }
+]
