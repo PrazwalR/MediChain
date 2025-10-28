@@ -53,3 +53,7 @@ artifacts
 
 .env
 .env.local
+
+.env
+.env.local
+
