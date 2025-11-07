@@ -1,7 +1,13 @@
 import React from "react";
+import { ethers } from "ethers";
 
 const Invoice = ({ invoic, currency }) => {
   console.log(invoic);
+  
+  // Convert price from Wei to ETH for display
+  const priceInEth = invoic?.price ? parseFloat(ethers.utils.formatEther(invoic.price)) : 0;
+  const totalPrice = priceInEth * (invoic?.quantity || 0);
+  
   return (
     <div className="container-fluid">
       <div className="page-titles">
@@ -36,11 +42,11 @@ const Invoice = ({ invoic, currency }) => {
                       <td className="left strong">{invoic?.medicine.name}</td>
                       <td className="left">{invoic?.medicine.email}</td>
                       <td className="right">
-                        {invoic?.price} {currency}
+                        {priceInEth} {currency}
                       </td>
                       <td className="center">{invoic?.quantity}</td>
                       <td className="right">
-                        {invoic?.quantity * invoic?.price} {currency}
+                        {totalPrice.toFixed(6)} {currency}
                       </td>
                     </tr>
                   </tbody>
@@ -56,7 +62,7 @@ const Invoice = ({ invoic, currency }) => {
                           <strong className="text-black">Subtotal</strong>
                         </td>
                         <td className="right">
-                          {invoic?.quantity * invoic?.price} {currency}
+                          {totalPrice.toFixed(6)} {currency}
                         </td>
                       </tr>
                       <tr>
@@ -77,7 +83,7 @@ const Invoice = ({ invoic, currency }) => {
                         </td>
                         <td className="right">
                           <strong className="text-black">
-                            {invoic?.quantity * invoic?.price} {currency}
+                            {totalPrice.toFixed(6)} {currency}
                           </strong>
                           <br />
                         </td>

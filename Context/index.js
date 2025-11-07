@@ -43,17 +43,17 @@ export const StateContextProvider = ({ children }) => {
   const CHECKI_IF_CONNECTED_LOAD = async () => {
     try {
       if (!window.ethereum) return console.log("Install MetaMask");
-      
+
       // Switch network first
       await HANDLE_NETWORK_SWITCH();
-      
+
       const accounts = await window.ethereum.request({
         method: "eth_accounts",
       });
 
       if (accounts.length) {
         setAddress(accounts[0]);
-        
+
         // Use direct RPC provider to avoid ENS issues
         try {
           const provider = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_holesky");
@@ -65,7 +65,7 @@ export const StateContextProvider = ({ children }) => {
           console.log("Balance check failed:", balanceError);
           setAccountBalance("0");
         }
-        
+
         return accounts[0];
       } else {
         return "No account";
@@ -80,10 +80,10 @@ export const StateContextProvider = ({ children }) => {
   const CONNECT_WALLET = async () => {
     try {
       if (!window.ethereum) return console.log("Install MetaMask");
-      
+
       // Switch network first
       await HANDLE_NETWORK_SWITCH();
-      
+
       const accounts = await window.ethereum.request({
         method: "eth_requestAccounts",
       });
@@ -175,11 +175,18 @@ export const StateContextProvider = ({ children }) => {
 
         const _IPFS_URL = await UPLOAD_METADATA(data);
 
+        // Convert price from ETH to Wei (smart contract expects Wei)
+        const priceInWei = ethers.utils.parseEther(price.toString());
+        
+        // Ensure quantity and discount are integers
+        const quantityInt = Number(quentity);
+        const discountInt = Number(discount);
+
         const transaction = await contract.ADD_MEDICINE(
           _IPFS_URL,
-          price,
-          quentity,
-          discount,
+          priceInWei,
+          quantityInt,
+          discountInt,
           currentLocation,
           {
             gasLimit: ethers.utils.hexlify(8000000),
@@ -252,9 +259,12 @@ export const StateContextProvider = ({ children }) => {
       if (address) {
         const contract = await HEALTH_CARE_CONTARCT();
 
+        // Convert price from ETH to Wei
+        const priceInWei = ethers.utils.parseEther(update.toString());
+
         const transaction = await contract.UPDATE_MEDICINE_PRICE(
           Number(medicineID),
-          Number(update),
+          priceInWei,
           {
             gasLimit: ethers.utils.hexlify(8000000),
           }
@@ -668,7 +678,7 @@ export const StateContextProvider = ({ children }) => {
         message,
         city,
       } = patient;
-      
+
       if (
         !title ||
         !firstName ||
@@ -700,15 +710,15 @@ export const StateContextProvider = ({ children }) => {
       try {
         // First ensure we're on the correct network
         await HANDLE_NETWORK_SWITCH();
-        
+
         // Initialize Web3 with MetaMask provider
         const web3 = new Web3(window.ethereum);
-        
+
         // Get current accounts
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });
-        
+
         if (!accounts.length) {
           setLoader(false);
           return notifyError("Please connect your wallet");
@@ -753,7 +763,7 @@ export const StateContextProvider = ({ children }) => {
         const _type = "Patient";
 
         console.log("Sending registration transaction...");
-        
+
         // Send transaction using Web3.js (completely bypasses ENS)
         const result = await contract.methods.ADD_PATIENTS(
           _IPFS_URL,
@@ -777,11 +787,11 @@ export const StateContextProvider = ({ children }) => {
           notifySuccess("Patient registration successful!");
           window.location.reload();
         }
-        
+
       } catch (contractError) {
         setLoader(false);
         console.error("Contract error:", contractError);
-        
+
         // Handle specific error types
         if (contractError.message.includes("User denied")) {
           notifyError("Transaction cancelled by user");
@@ -876,9 +886,8 @@ export const StateContextProvider = ({ children }) => {
 
         const _patientID = await contract.GET_PATIENT_ID(address);
 
-        const price = _price * Number(_quantity);
-
-        const parsedAmount = ethers.utils.parseEther(price.toString());
+        // _price is already in Wei (BigNumber), so multiply directly
+        const totalPrice = ethers.BigNumber.from(_price).mul(Number(_quantity));
 
         const paymentHash = await ethereum.request({
           method: "eth_sendTransaction",
@@ -887,7 +896,7 @@ export const StateContextProvider = ({ children }) => {
               from: address,
               to: ADMIN_ADDRESS,
               gas: "0x5208",
-              value: parsedAmount._hex,
+              value: totalPrice._hex,
             },
           ],
         });

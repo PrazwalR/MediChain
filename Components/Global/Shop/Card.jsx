@@ -1,4 +1,5 @@
 import React from "react";
+import { ethers } from "ethers";
 
 const Card = ({
   item,
@@ -24,7 +25,7 @@ const Card = ({
 
               <del className="discount">{item.discount} %</del>
               <span className="price">
-                {item.price} {currency}
+                {item.price ? ethers.utils.formatEther(item.price) : '0'} {currency}
               </span>
             </div>
           </div>

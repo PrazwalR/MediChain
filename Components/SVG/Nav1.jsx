@@ -11,8 +11,8 @@ const Nav1 = () => {
       xmlns="http://www.w3.org/2000/svg"
     >
       {/* Medical Cross Background Circle */}
-      <circle cx="26" cy="26" r="24" fill="url(#paint0_linear)" stroke="#fff" strokeWidth="2"/>
-      
+      <circle cx="26" cy="26" r="24" fill="url(#paint0_linear)" stroke="#fff" strokeWidth="2" />
+
       {/* Medical Cross */}
       <path
         d="M26 10V42M10 26H42"
@@ -20,7 +20,7 @@ const Nav1 = () => {
         strokeWidth="4"
         strokeLinecap="round"
       />
-      
+
       {/* Medical Caduceus Snake Elements */}
       <path
         d="M20 16C22 18 24 20 26 18C28 20 30 18 32 16"
@@ -36,13 +36,13 @@ const Nav1 = () => {
         fill="none"
         strokeLinecap="round"
       />
-      
+
       {/* Small medical symbols */}
-      <circle cx="19" cy="19" r="2" fill="#b6d7ff"/>
-      <circle cx="33" cy="19" r="2" fill="#b6d7ff"/>
-      <circle cx="19" cy="33" r="2" fill="#b6d7ff"/>
-      <circle cx="33" cy="33" r="2" fill="#b6d7ff"/>
-      
+      <circle cx="19" cy="19" r="2" fill="#b6d7ff" />
+      <circle cx="33" cy="19" r="2" fill="#b6d7ff" />
+      <circle cx="19" cy="33" r="2" fill="#b6d7ff" />
+      <circle cx="33" cy="33" r="2" fill="#b6d7ff" />
+
       <defs>
         <linearGradient
           id="paint0_linear"

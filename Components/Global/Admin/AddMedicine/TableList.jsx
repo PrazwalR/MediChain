@@ -1,4 +1,5 @@
 import React from "react";
+import { ethers } from "ethers";
 //INTERNAL IMPORT
 import { TableList4 } from "../../../SVG/index";
 import { useStateContext } from "../../../../Context/index";
@@ -40,7 +41,7 @@ const TableList = ({
       </td>
       <td>{item?.name}</td>
       <td>{item?.verifyingDoctor}</td>
-      <td>{item?.price}</td>
+      <td>{item?.price ? ethers.utils.formatEther(item.price) : '0'} ETH</td>
       <td>{item?.quantity}</td>
       <td>
         <span className="font-w500">{item?.discount || "0%"}</span>

@@ -1,4 +1,5 @@
 import React from "react";
+import { ethers } from "ethers";
 
 const Update = ({
   prescribeDoctor,
@@ -37,7 +38,7 @@ const Update = ({
                       <option>Select medicine</option>
                       {registerMedicine?.map((medicine, index) => (
                         <option key={index} value={medicine?.medicineID}>
-                          {medicine?.name} $ {medicine?.price}
+                          {medicine?.name} {medicine?.price ? ethers.utils.formatEther(medicine.price) : '0'} ETH
                         </option>
                       ))}
                     </select>

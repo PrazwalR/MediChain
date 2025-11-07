@@ -22,8 +22,8 @@ const Card = ({
       <div className={`card gradient-bx text-white ${classStyle} ${disabled ? 'disabled-card' : ''}`}>
         <div className="card-body auth-width">
           {disabled && (
-            <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" 
-                 style={{ background: "rgba(0,0,0,0.3)", zIndex: 1, borderRadius: "inherit" }}>
+            <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+              style={{ background: "rgba(0,0,0,0.3)", zIndex: 1, borderRadius: "inherit" }}>
               <span className="text-white fw-bold">🔒 Connect Wallet First</span>
             </div>
           )}

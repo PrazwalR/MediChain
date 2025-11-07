@@ -185,7 +185,7 @@ const index = () => {
       try {
         // First ensure we're on the correct network
         await HANDLE_NETWORK_SWITCH();
-        
+
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });

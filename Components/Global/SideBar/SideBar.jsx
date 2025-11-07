@@ -194,7 +194,7 @@ const SideBar = ({
             2025 All Rights Reserved
           </p>
           <p className="fs-12">
-            Made by @jonnala.adithya@gmail.com
+            Made by prazwalr07@gmail.com
           </p>
         </div>
       </div>

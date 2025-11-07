@@ -25,6 +25,19 @@ const PINATA_SECRECT_KEY = process.env.NEXT_PUBLIC_PINATA_SECRECT_KEY;
 
 //NETWORK
 const networks = {
+  sepolia: {
+    chainId: `0x${Number(11155111).toString(16)}`,
+    chainName: "Sepolia",
+    nativeCurrency: {
+      name: "ETH",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    rpcUrls: [
+      "https://eth-sepolia.g.alchemy.com/v2/I6MHs_ilXH9PUViB5gKgY",
+    ],
+    blockExplorerUrls: ["https://sepolia.etherscan.io/"],
+  },
   holesky: {
     chainId: `0x${Number(17000).toString(16)}`,
     chainName: "Holesky",
@@ -34,7 +47,7 @@ const networks = {
       decimals: 18,
     },
     rpcUrls: [
-      "https://rpc.ankr.com/eth_holesky/86add4e60d19755c26da6dd7566a82a53b3d8e39222787f3efb6f646148f1864",
+      "https://eth-holesky.g.alchemy.com/v2/0wEU0zf1IOHCUWtp8xKrC",
     ],
     blockExplorerUrls: ["https://holesky.etherscan.io/"],
   },
@@ -106,6 +119,11 @@ const networks = {
   },
 };
 
+// Guard to prevent multiple simultaneous network switch calls
+let isNetworkSwitching = false;
+let lastNetworkSwitchTime = 0;
+const NETWORK_SWITCH_COOLDOWN = 2000; // 2 seconds cooldown
+
 const changeNetwork = async ({ networkName }) => {
   try {
     if (!window.ethereum) throw new Error("No crypto wallet found");
@@ -124,9 +142,25 @@ const changeNetwork = async ({ networkName }) => {
 };
 
 export const HANDLE_NETWORK_SWITCH = async () => {
-  const networkName = NETWORK;
-  const network = await changeNetwork({ networkName });
-  return network;
+  // Prevent multiple simultaneous calls
+  const now = Date.now();
+  if (isNetworkSwitching || (now - lastNetworkSwitchTime) < NETWORK_SWITCH_COOLDOWN) {
+    console.log("Network switch already in progress or in cooldown");
+    return;
+  }
+
+  try {
+    isNetworkSwitching = true;
+    const networkName = NETWORK;
+    const network = await changeNetwork({ networkName });
+    lastNetworkSwitchTime = Date.now();
+    return network;
+  } finally {
+    // Reset the flag after a short delay
+    setTimeout(() => {
+      isNetworkSwitching = false;
+    }, 500);
+  }
 };
 
 export const SHORTEN_ADDRESS = (address) =>
@@ -157,19 +191,20 @@ export function CONVERT_TIMESTAMP_TO_READABLE(timeStamp) {
 const FETCH_CONTRACT = (address, abi, signer) =>
   new ethers.Contract(address, abi, signer);
 
-// Create ENS-free provider for Holesky
+// Create ENS-free provider for Sepolia
 const createENSFreeProvider = () => {
   // Use direct RPC connection to avoid any ENS resolution
-  const provider = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_holesky");
+  const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || "https://eth-sepolia.g.alchemy.com/v2/I6MHs_ilXH9PUViB5gKgY";
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
   return provider;
 };
 
 export const HEALTH_CARE_CONTARCT = async () => {
   try {
     if (!window.ethereum) throw new Error("No crypto wallet found");
-    
+
     await HANDLE_NETWORK_SWITCH();
-    
+
     // Use ENS-free provider for read operations and MetaMask for signing
     const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = web3Provider.getSigner();
@@ -186,16 +221,16 @@ export const HEALTH_CARE_CONTARCT = async () => {
 export const GET_WEB3_CONTRACT = async () => {
   try {
     if (!window.ethereum) throw new Error("No crypto wallet found");
-    
+
     // Ensure correct network
     await HANDLE_NETWORK_SWITCH();
-    
+
     // Initialize Web3
     const web3 = new Web3(window.ethereum);
-    
+
     // Create contract instance
     const contract = new web3.eth.Contract(HEALTH_CARE_ABI, HEALTH_CARE_ADDRESS);
-    
+
     return { contract, web3 };
   } catch (error) {
     console.error("Web3 contract connection error:", error);
@@ -207,10 +242,10 @@ export const GET_WEB3_CONTRACT = async () => {
 export const GET_SIMPLE_CONTRACT = async () => {
   try {
     if (!window.ethereum) throw new Error("No crypto wallet found");
-    
+
     // Ensure correct network
     await HANDLE_NETWORK_SWITCH();
-    
+
     // Use ENS-free provider
     const provider = createENSFreeProvider();
     const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -228,14 +263,14 @@ export const GET_SIMPLE_CONTRACT = async () => {
 export const CHECKI_IF_CONNECTED = async () => {
   try {
     if (!window.ethereum) return "Install MetaMask";
-    
+
     // Ensure network is switched first
     await HANDLE_NETWORK_SWITCH();
-    
+
     const accounts = await window.ethereum.request({
       method: "eth_accounts",
     });
-    
+
     if (accounts.length) {
       return accounts[0];
     } else {
@@ -871,7 +906,8 @@ export const CHECK_PATIENT_REGISTERATION = async (_patientAddress) => {
     if (!_patientAddress) return console.log("Data Missing");
 
     // Use ENS-free provider for reading
-    const provider = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_holesky");
+    const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || "https://eth-sepolia.g.alchemy.com/v2/I6MHs_ilXH9PUViB5gKgY";
+    const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
     const contract = new ethers.Contract(HEALTH_CARE_ADDRESS, HEALTH_CARE_ABI, provider);
 
     const patient = await contract.GET_PATIENT_ID(_patientAddress);

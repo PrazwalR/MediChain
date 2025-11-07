@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { ethers } from "ethers";
 
 ///INTERNAL IMPORT
 import { FaShoppingBag } from "../../ReactICON/index";
@@ -180,7 +181,7 @@ const MedicDetails = ({
                   </div>
                   <div className="d-table mb-2">
                     <p className="price float-start d-block">
-                      Price: {medicineDetails?.price} {currency}
+                      Price: {medicineDetails?.price ? ethers.utils.formatEther(medicineDetails.price) : '0'} {currency}
                     </p>
                   </div>
                   <p className="text-black">
